@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Version Control with git</title>
+<meta name="author" content="(Graham Lee)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/serif.css" id="theme"/>
+
+<link rel="stylesheet" href="https://raw.githubusercontent.com/OxRSE/rsd-engineeringcourse/master/presentation/custom.css"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'https://cdn.jsdelivr.net/reveal.js/3.0.0/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section id="sec-title-slide"><h1 class="title">Version Control with git</h1><h2 class="author">Graham Lee</h2>
+</section>
+
+<section>
+<section id="slide-sec-">
+<h2 id="org2560c92">Version control</h2>
+<p>
+What are we trying to achieve?
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgdff48e7">For one person</h3>
+<ul>
+<li>An unlimited undo stack</li>
+<li>With annotated history</li>
+<li>And timestamps</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgd5b392b">How do I do that?</h3>
+<ul>
+<li>edit</li>
+<li>commit</li>
+<li>edit</li>
+<li>commit</li>
+<li>edit</li>
+<li>whoops! revert</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgcf9d591">For two or more people</h3>
+<ul>
+<li>A shared undo stack</li>
+<li>Common history</li>
+<li>Apply my changes to team's work</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org7a379ce">How do we do that?</h3>
+<p>
+Player 1:
+</p>
+
+<ul>
+<li>edit</li>
+<li>commit</li>
+<li>update</li>
+
+</ul>
+
+<p>
+Player 2:
+</p>
+
+<ul>
+<li>checkout</li>
+<li>edit</li>
+<li>commit</li>
+<li>update</li>
+
+</ul>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org75b0b32">Git</h2>
+<div class="outline-text-2" id="text-org75b0b32">
+</div>
+</section>
+<section id="slide-sec-">
+<h3 id="org421279a">Git version control</h3>
+<p>
+Git is a particular version control system. There are others.
+</p>
+
+<p>
+Popularised around 2008-2011, after the introduction of GitHub.
+</p>
+
+<p>
+GitHub is not git, it is a social network based on git interactions.
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org9afeff2">Workflow</h3>
+<p>
+Git knows about three places where changes exist.
+</p>
+
+<ul>
+<li><i>Local files</i> - what you have on your disk.</li>
+<li><i>Staging area</i> - things you've told git about but not committed.</li>
+<li><i>Repository</i> - a graph of committed changes and their relationships.</li>
+
+</ul>
+
+<aside class="notes">
+<p>
+
+</p>
+
+<p>
+The staging area acts as a place to assemble your thoughts, and gives
+you a chance to undo before you commit. The "commit" word is like
+"commitment": it's much harder to pretend you didn't do something if
+you're committed.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-">
+<h4 id="orga9b28e2"></h4>
+
+<div class="figure">
+<p><img src="./images/staging.png" alt="staging.png" />
+</p>
+</div>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org0bbeb3f">Getting started</h2>
+<div class="outline-text-2" id="text-org0bbeb3f">
+</div>
+</section>
+<section id="slide-sec-">
+<h3 id="org79eb328">Walkthrough</h3>
+<p>
+Hopefully, you've installed git.
+</p>
+
+<aside class="notes">
+<p>
+If you're on Windows, you'll find a git-bash program in your Start
+menu. Use that.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org9a2a4f5">Configure git</h4>
+<pre class="example">
+$ git config --global user.name "Graham Lee"
+$ git config --global user.email "graham.lee@cs.ox.ac.uk"
+$ git config --global core.editor nano
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org01df19e">Make a repository</h4>
+<pre class="example">
+$ mkdir learning_git
+$ cd learning_git
+$ git init .
+Initialised empty Git repository in /tmp/learning_git/.git/
+
+</pre>
+
+<aside class="notes">
+<p>
+You may want to do this somewhere specific, like Documents.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org2d810cd">Check that it worked</h4>
+<pre class="example">
+$ git status
+On branch master
+
+No commits yet
+
+nothing to commit (create/copy files and use "git add" to track)
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgc4e6988">A first file</h3>
+<div class="outline-text-3" id="text-orgc4e6988">
+</div>
+</section>
+<section id="slide-sec-">
+<h4 id="orgf4f4529">Create the file</h4>
+<pre class="example">
+$ nano index.md
+
+Mountains in the UK   
+===================   
+England is not very mountainous.   
+But has some tall hills, and maybe a mountain or two.
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org5c62d15">It's not in git!</h4>
+<pre class="example">
+$ git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+
+	index.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="orgf90fa56">Git told us twice to use "git add"</h4>
+<p>
+So let's do that. This <i>stages</i> the file.
+</p>
+
+<pre class="example">
+$ git add index.md
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org587fdef">And now commit the staged changes</h4>
+<pre class="example">
+$ git commit -m "First commit of discourse on UK topography"
+[master (root-commit) 20ad49c] First commit of discourse on UK topography
+ 1 file changed, 4 insertions(+)
+ create mode 100644 index.md
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="orgda78f69">Confirm that the change is there&#x2026;</h4>
+<pre class="example">
+$ git log
+commit 20ad49cfd1a8a359d30f433dd7263fb25c43c400 (HEAD -&gt; master)
+Author: Graham Lee &lt;graham.lee@cs.ox.ac.uk&gt;
+Date:   Thu Jun 27 09:28:58 2019 +0100
+
+    First commit of discourse on UK topography
+</pre>
+
+<aside class="notes">
+<p>
+The long 20ad&#x2026; number is a commit hash, which uniquely
+identifies this change. When git needs you to refer to a commit, you can use this hash. But you don't need to type the whole thing, just enough to be uniquely identifiable.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-">
+<h4 id="orgaa9a4c5">&#x2026;and there are no more outstanding changes</h4>
+<pre class="example">
+$ git status
+On branch master
+nothing to commit, working tree clean
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org6aade4f">Make another change</h4>
+<pre class="example">
+$ nano index.md
+
+Mountains in the UK
+===================
+England is not very mountainous.
+But has some tall hills, and maybe a mountain or two.
+
+Mount Fictional, in Barsetshire, U.K., is the tallest
+mountain in the world.
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="orgcdad1a7">git can see the change&#x2026;</h4>
+<pre class="example">
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+
+	modified:   index.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+
+<aside class="notes">
+<p>
+Git wouldn't commit our change yet, because we haven't staged it.
+</p>
+
+</aside>
+
+</section>
+<section id="slide-sec-">
+<h4 id="orgf17a4e9">&#x2026;and can show us the differences</h4>
+<pre class="example">
+$ git diff
+diff --git a/index.md b/index.md
+index 9f69649..699e698 100644
+--- a/index.md
++++ b/index.md
+@@ -2,3 +2,7 @@ Mountains in the UK
+ ===================   
+ England is not very mountainous.   
+ But has some tall hills, and maybe a mountain or two.
++
++Mount Fictional, in Barsetshire, U.K., is the tallest
++mountain in the world.
++
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org6170db6">Add all updated files, and commit</h4>
+<pre class="example">
+$ git add --update
+
+$ git commit -m "Add a lie about a mountain."
+[master d250add] Add a lie about a mountain.
+ 1 file changed, 4 insertions(+)
+
+$ git log --oneline
+d250add (HEAD -&gt; master) Add a lie about a mountain.
+20ad49c First commit of discourse on UK topography
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h4 id="org1160591">Oops!</h4>
+<p>
+There was a mistake there. As git is "an unlimited undo stack",
+we'll be able to fix that.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org07bb2aa">Correcting mistakes</h2>
+<p>
+Git gives us multiple tools for fixing our problems. We can:
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org836b485">Commit a fixed version</h3>
+<p>
+Change the file, add it, commit it.
+This is often easy to do, and to understand.
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org6dc4d2e">Revert a commit</h3>
+<p>
+Add a new commit that "undoes" a previous commit.
+Easiest if you know that a change shouldn't have been made.
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgba84cea">Reset your repository</h3>
+<p>
+You can tell git that any commit represents the "current state".
+Later commits will just disappear. This rewrites history.
+</p>
+
+<p>
+On shared projects, this is considered bad form.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org40b381d">Publishing on Github</h2>
+<div class="outline-text-2" id="text-org40b381d">
+</div>
+</section>
+<section id="slide-sec-">
+<h3 id="org700eeb7">What is GitHub?</h3>
+<ul>
+<li>A cloud store for git repositories</li>
+<li>A social network for programmers</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org9967e27">Getting Started</h3>
+<ul>
+<li>Create an account (if you haven't already)</li>
+<li>(Optionally, but recommended) set up an SSH key</li>
+<li>Press "new repository" in github, set a name, description, make it public.</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org2f4cb20">Add a Remote</h3>
+<p>
+Your git repo needs to know about the one on github. Git calls other repositories "remotes".
+</p>
+
+<pre class="example">
+$ git remote add origin https://github.com/iamleeg/github-example.git
+</pre>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org8e2c3cb">Sharing with git</h3>
+<p>
+<i>push</i> and <i>pull</i> work with commits, not local files or staged changes.
+</p>
+
+
+<div class="figure">
+<p><img src="./images/remotes.png" alt="remotes.png" />
+</p>
+</div>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgda0e329">Your first push!</h3>
+<p>
+Publish your work so far:
+</p>
+
+<pre class="example">
+$ git push -u origin master
+Counting objects: 12, done.
+Delta compression using up to 12 threads.
+Compressing objects: 100% (8/8), done.
+Writing objects: 100% (12/12), 1.04 KiB | 356.00 KiB/s, done.
+Total 12 (delta 4), reused 0 (delta 0)
+remote: Resolving deltas: 100% (4/4), done.
+To github.com:iamleeg/github_example.git
+ * [new branch]      master -&gt; master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+</pre>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org380f5ff">Collaborating with Github</h2>
+<div class="outline-text-2" id="text-org380f5ff">
+</div>
+</section>
+<section id="slide-sec-">
+<h3 id="orgf70df3a">You can form a team</h3>
+<p>
+The owner of a repository in Github can add other people as collaborators through the repository's settings page.
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org559f785">&#x2026;or not.</h3>
+<p>
+If you can see a repository on Github, you can "fork" it to create your own copy.
+</p>
+
+<p>
+You're allowed to work in the fork. Later, you can share changes "upstream" to the original repository's owner.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org6ad690f">Pull Requests</h2>
+<p>
+Make changes in your own fork. When you're ready, press the pull request button in Github.
+</p>
+
+<p>
+The owner of the original repo sees the pull request. They can review the code, suggest changes, accept or reject the pull request.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="orgfedfcf6">Conflicts</h2>
+<p>
+A conflict happens when two changes cannot be merged automatically by the computer.
+</p>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org29e0056">Example conflict</h3>
+<p>
+I have this shopping list:
+</p>
+
+<ul>
+<li>Beans</li>
+<li>Eggs</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgd160c69">I make a change:</h3>
+<ul>
+<li>Beans</li>
+<li>Bacon</li>
+<li>Eggs</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="org7f82419">My housemate does too:</h3>
+<ul>
+<li>Beans</li>
+<li>Tofu</li>
+<li>Eggs</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-">
+<h3 id="orgf6d0473">Fix that</h3>
+<p>
+Should my change go in? Their change? Both changes? In which order?
+</p>
+
+<p>
+There's no way to know without understanding our problem.
+</p>
+
+<p>
+Good practice to resolve conflicts in the pull request, to reduce the work the upstream owner must do.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-sec-">
+<h2 id="org06ea9d3">This presentation</h2>
+<p>
+&#x2026;is on Github!
+</p>
+
+<p>
+<a href="https://github.com/OxfordRSE/rsd-engineeringcourse">https://github.com/OxfordRSE/rsd-engineeringcourse</a>
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="https://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: false,
+keyboard: true,
+overview: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: 'https://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

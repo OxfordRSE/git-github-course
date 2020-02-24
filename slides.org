@@ -1,0 +1,381 @@
+#+OPTIONS: num:nil toc:nil timestamp:nil
+#+REVEAL_PLUGINS: (notes)
+#+REVEAL_ROOT: https://cdn.jsdelivr.net/reveal.js/3.0.0/
+#+REVEAL_THEME: serif
+#+REVEAL_EXTRA_CSS: https://raw.githubusercontent.com/OxRSE/rsd-engineeringcourse/master/presentation/custom.css
+#+Title: Version Control with git
+#+Author: Graham Lee
+#+Email: graham.lee@cs.ox.ac.uk
+
+* Version control
+
+What are we trying to achieve?
+
+** For one person
+
+ - An unlimited undo stack
+ - With annotated history
+ - And timestamps
+
+** How do I do that?
+
+ - edit
+ - commit
+ - edit
+ - commit
+ - edit
+ - whoops! revert
+
+** For two or more people
+
+ - A shared undo stack
+ - Common history
+ - Apply my changes to team's work
+
+** How do we do that?
+
+Player 1:
+
+ - edit
+ - commit
+ - update
+
+Player 2:
+
+ - checkout
+ - edit
+ - commit
+ - update
+
+* Git
+
+** Git version control
+
+Git is a particular version control system. There are others.
+
+Popularised around 2008-2011, after the introduction of GitHub.
+
+GitHub is not git, it is a social network based on git interactions.
+
+** Workflow
+
+Git knows about three places where changes exist.
+
+ - /Local files/ - what you have on your disk.
+ - /Staging area/ - things you've told git about but not committed.
+ - /Repository/ - a graph of committed changes and their relationships.
+
+#+BEGIN_NOTES
+
+The staging area acts as a place to assemble your thoughts, and gives
+you a chance to undo before you commit. The "commit" word is like
+"commitment": it's much harder to pretend you didn't do something if
+you're committed.
+
+#+END_NOTES
+
+*** 
+
+[[./images/staging.png]]
+
+* Getting started
+
+** Walkthrough
+Hopefully, you've installed git.
+
+#+BEGIN_NOTES
+If you're on Windows, you'll find a git-bash program in your Start
+menu. Use that.
+#+END_NOTES
+
+*** Configure git
+
+#+BEGIN_EXAMPLE
+$ git config --global user.name "Graham Lee"
+$ git config --global user.email "graham.lee@cs.ox.ac.uk"
+$ git config --global core.editor nano
+#+END_EXAMPLE
+
+*** Make a repository
+
+#+BEGIN_EXAMPLE
+$ mkdir learning_git
+$ cd learning_git
+$ git init .
+Initialised empty Git repository in /tmp/learning_git/.git/
+
+#+END_EXAMPLE
+
+#+BEGIN_NOTES
+You may want to do this somewhere specific, like Documents.
+#+END_NOTES
+
+*** Check that it worked
+
+#+BEGIN_EXAMPLE
+$ git status
+On branch master
+
+No commits yet
+
+nothing to commit (create/copy files and use "git add" to track)
+#+END_EXAMPLE
+
+** A first file
+
+*** Create the file
+
+#+BEGIN_EXAMPLE
+$ nano index.md
+
+Mountains in the UK   
+===================   
+England is not very mountainous.   
+But has some tall hills, and maybe a mountain or two.
+#+END_EXAMPLE
+
+*** It's not in git!
+
+#+BEGIN_EXAMPLE
+$ git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	index.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+#+END_EXAMPLE
+
+*** Git told us twice to use "git add"
+
+So let's do that. This /stages/ the file.
+
+#+BEGIN_EXAMPLE
+$ git add index.md
+#+END_EXAMPLE
+
+*** And now commit the staged changes
+
+#+BEGIN_EXAMPLE
+$ git commit -m "First commit of discourse on UK topography"
+[master (root-commit) 20ad49c] First commit of discourse on UK topography
+ 1 file changed, 4 insertions(+)
+ create mode 100644 index.md
+#+END_EXAMPLE
+
+*** Confirm that the change is there...
+
+#+BEGIN_EXAMPLE
+$ git log
+commit 20ad49cfd1a8a359d30f433dd7263fb25c43c400 (HEAD -> master)
+Author: Graham Lee <graham.lee@cs.ox.ac.uk>
+Date:   Thu Jun 27 09:28:58 2019 +0100
+
+    First commit of discourse on UK topography
+#+END_EXAMPLE
+
+#+BEGIN_NOTES
+The long 20ad... number is a commit hash, which uniquely
+identifies this change. When git needs you to refer to a commit, you can use this hash. But you don't need to type the whole thing, just enough to be uniquely identifiable.
+#+END_NOTES
+
+*** ...and there are no more outstanding changes
+
+#+BEGIN_EXAMPLE
+$ git status
+On branch master
+nothing to commit, working tree clean
+#+END_EXAMPLE
+
+*** Make another change
+
+#+BEGIN_EXAMPLE
+$ nano index.md
+
+Mountains in the UK
+===================
+England is not very mountainous.
+But has some tall hills, and maybe a mountain or two.
+
+Mount Fictional, in Barsetshire, U.K., is the tallest
+mountain in the world.
+#+END_EXAMPLE
+
+*** git can see the change...
+
+#+BEGIN_EXAMPLE
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   index.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+#+END_EXAMPLE
+
+#+BEGIN_NOTES
+Git wouldn't commit our change yet, because we haven't staged it.
+#+END_NOTES
+
+*** ...and can show us the differences
+
+#+BEGIN_EXAMPLE
+$ git diff
+diff --git a/index.md b/index.md
+index 9f69649..699e698 100644
+--- a/index.md
++++ b/index.md
+@@ -2,3 +2,7 @@ Mountains in the UK
+ ===================   
+ England is not very mountainous.   
+ But has some tall hills, and maybe a mountain or two.
++
++Mount Fictional, in Barsetshire, U.K., is the tallest
++mountain in the world.
++
+#+END_EXAMPLE
+
+*** Add all updated files, and commit
+
+#+BEGIN_EXAMPLE
+$ git add --update
+
+$ git commit -m "Add a lie about a mountain."
+[master d250add] Add a lie about a mountain.
+ 1 file changed, 4 insertions(+)
+
+$ git log --oneline
+d250add (HEAD -> master) Add a lie about a mountain.
+20ad49c First commit of discourse on UK topography
+#+END_EXAMPLE
+
+*** Oops!
+
+There was a mistake there. As git is "an unlimited undo stack",
+we'll be able to fix that.
+
+* Correcting mistakes
+
+Git gives us multiple tools for fixing our problems. We can:
+
+** Commit a fixed version
+
+Change the file, add it, commit it.
+This is often easy to do, and to understand.
+
+** Revert a commit
+
+Add a new commit that "undoes" a previous commit.
+Easiest if you know that a change shouldn't have been made.
+
+** Reset your repository
+
+You can tell git that any commit represents the "current state".
+Later commits will just disappear. This rewrites history.
+
+On shared projects, this is considered bad form.
+
+* Publishing on Github
+
+** What is GitHub?
+
+- A cloud store for git repositories
+- A social network for programmers
+
+** Getting Started
+
+- Create an account (if you haven't already)
+- (Optionally, but recommended) set up an SSH key
+- Press "new repository" in github, set a name, description, make it public.
+
+** Add a Remote
+
+Your git repo needs to know about the one on github. Git calls other repositories "remotes".
+
+#+BEGIN_EXAMPLE
+$ git remote add origin https://github.com/iamleeg/github-example.git
+#+END_EXAMPLE
+
+** Sharing with git
+
+/push/ and /pull/ work with commits, not local files or staged changes.
+
+[[./images/remotes.png]]
+
+** Your first push!
+
+Publish your work so far:
+
+#+BEGIN_EXAMPLE
+$ git push -u origin master
+Counting objects: 12, done.
+Delta compression using up to 12 threads.
+Compressing objects: 100% (8/8), done.
+Writing objects: 100% (12/12), 1.04 KiB | 356.00 KiB/s, done.
+Total 12 (delta 4), reused 0 (delta 0)
+remote: Resolving deltas: 100% (4/4), done.
+To github.com:iamleeg/github_example.git
+ * [new branch]      master -> master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+#+END_EXAMPLE
+
+* Collaborating with Github
+
+** You can form a team
+
+The owner of a repository in Github can add other people as collaborators through the repository's settings page.
+
+** ...or not.
+
+If you can see a repository on Github, you can "fork" it to create your own copy.
+
+You're allowed to work in the fork. Later, you can share changes "upstream" to the original repository's owner.
+
+* Pull Requests
+
+Make changes in your own fork. When you're ready, press the pull request button in Github.
+
+The owner of the original repo sees the pull request. They can review the code, suggest changes, accept or reject the pull request.
+
+* Conflicts
+
+A conflict happens when two changes cannot be merged automatically by the computer.
+
+** Example conflict
+
+I have this shopping list:
+
+ - Beans
+ - Eggs
+
+** I make a change:
+
+ - Beans
+ - Bacon
+ - Eggs
+
+** My housemate does too:
+
+ - Beans
+ - Tofu
+ - Eggs
+
+** Fix that
+
+Should my change go in? Their change? Both changes? In which order?
+
+There's no way to know without understanding our problem.
+
+Good practice to resolve conflicts in the pull request, to reduce the work the upstream owner must do.
+
+* This presentation
+
+...is on Github!
+
+https://github.com/OxfordRSE/rsd-engineeringcourse
